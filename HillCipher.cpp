@@ -114,7 +114,6 @@ int invMod(const int x) {
     throw std::invalid_argument("Inverse mod for this encoding matrix does not exist!");
 }
 // Finds the inverse of a matrix and takes mod 26 of the result
-// Need to find a way to calculate the mod of a fraction
 std::vector<std::vector<int>> invertMatrix(const std::vector<std::vector<int>> m) {
     // Finds the adjoint of the matrix
     std::vector<std::vector<int>> adjoint;
