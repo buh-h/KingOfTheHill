@@ -103,7 +103,18 @@ int determinant(const std::vector<std::vector<int>> m) {
     return detSum;
 }
 
+// Finds the inverse mod of a value
+int invMod(const int x) {
+    // Brute force finds for a solution to an inverse mod
+    for (int i=1; i<=25; i++) {
+        int mod = (x*i) % 26;
+        if (mod < 0 && mod + 26 == 1) return i;
+        else if ((x*i) % 26 == 1) return i;
+    }
+    throw std::invalid_argument("Inverse mod for this encoding matrix does not exist!");
+}
 // Finds the inverse of a matrix and takes mod 26 of the result
+// Need to find a way to calculate the mod of a fraction
 std::vector<std::vector<int>> invertMatrix(const std::vector<std::vector<int>> m) {
     // Finds the adjoint of the matrix
     std::vector<std::vector<int>> adjoint;
@@ -114,16 +125,13 @@ std::vector<std::vector<int>> invertMatrix(const std::vector<std::vector<int>> m
             adjoint[i].push_back(determinant(minor(m, j, i)) * pow(-1, i+j));
         }
     }
-    // Finds the determinant of the matrix
-    int det = determinant(m);
-    int temp = pow(det, 24); // Intermediate calculation for Fermat's little theorem
     // Finds the inverse of the matrix using the determinant and adjoint
     std::vector<std::vector<int>> inverse;
     for (int i=0; i<m.size(); i++) {
         inverse.push_back(std::vector<int>(0, 0));
         for (int j=0; j<m[0].size(); j++) {
-            // Takes mod 26 of the expression using Fermat's little therem
-            inverse[i].push_back((adjoint[i][j] % 26 * (temp % 26)) % 26);
+            // Takes mod 26 of adjoint, and inverse mod of the determinant to ensure integer results
+            inverse[i].push_back(adjoint[i][j] % 26 * invMod(determinant(m)));
             // Ensures all values of inverse are positive
             if (inverse[i][j] < 0) {
                 inverse[i][j] = inverse[i][j] + 26;
@@ -139,6 +147,9 @@ std::string encode(const std::string plaintext, const std::vector<std::vector<in
     // Throws exception if encoding matrix is not square (nxn) 
     if (encoding.size() != encoding[0].size()) {
         throw std::invalid_argument("Encoding Matrix is not square!");
+    }
+    if (26 % determinant(encoding) == 0) {
+        throw std::invalid_argument("Determinant of encoding matrix is not relatively prime to 26!");
     }
     // Ensures plaintextNumbers is divisible by n by repeating the last element
     int lastNum = plaintextNumbers.back();
@@ -170,6 +181,9 @@ std::string decode(const std::string ciphertext, const std::vector<std::vector<i
     if (encoding.size() != encoding[0].size()) {
         throw std::invalid_argument("Encoding Matrix is not square!");
     }
+    if (26 % determinant(encoding) == 0) {
+        throw std::invalid_argument("Determinant of encoding matrix is not relatively prime to 26!");
+    }
     // Ensures ciphertextNumbers is divisible by n by repeating the last element
     int lastNum = ciphertextNumbers.back();
     for (int i=0; i<ciphertextNumbers.size() % encoding.size(); i++) {
@@ -195,18 +209,18 @@ std::string decode(const std::string ciphertext, const std::vector<std::vector<i
 
 int main() {
     std::string message = "this is a test message";
-    std::vector<std::vector<int>> key {{1, 2}, {3, 4}};
+    std::vector<std::vector<int>> key {{1, 3}, {3, 4}};
     std::string encoded = encode(message, key);
     std::string decoded = decode(encoded, key);
-    //std::cout<< encoded;
-    //std::cout << decoded;
+    std::cout<< encoded << " ";
+    std::cout << decoded;
     std::vector<std::vector<int>> inverse = invertMatrix(key);
-    //std::vector<std::vector<int>> a = minor(key, 0, 0);
+    std::vector<std::vector<int>> a = minor(key, 0, 0);
     //std::cout << determinant(key);
-    for (int i=0; i < inverse.size(); i++) {
-        for (int j=0; j<inverse.size(); j++) {
-            std::cout << inverse[i][j] << " ";
-        }
-    }
+    // for (int i=0; i < inverse.size(); i++) {
+    //     for (int j=0; j<inverse.size(); j++) {
+    //         std::cout << inverse[i][j] << " ";
+    //     }
+    // }
     return 0;
 }
