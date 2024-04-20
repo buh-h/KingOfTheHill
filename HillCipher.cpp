@@ -52,23 +52,7 @@ std::vector<int> multiplyMatrixVector(const std::vector<std::vector<int>> m, con
     }
     return result;
 }
-// Multiplies a matrix and a vector when vector is on left
-std::vector<int> multiplyMatrixVector(const std::vector<int> v, const std::vector<std::vector<int>> m) {
-    std::vector<int> result;
-    // Throws exception is a and b cannot be multiplied
-    if (v.size() != m.size()) {
-        throw std::invalid_argument("Matrix and vector cannot be multiplied!");
-    }
 
-    for (int i=0; i<m[0].size(); i++) {
-        result.push_back(0); 
-        // Dot product of ith row of a and b
-        for (int j=0; j<m.size(); j++) {
-            result[i] += m[j][i] * v[j];
-        }
-    }
-    return result;
-}
 // Finds the minor of a matrix
 std::vector<std::vector<int>> minor(std::vector<std::vector<int>> m, int x, int y) {
     // std::vector<std::vector<int>> minor; 
@@ -116,8 +100,7 @@ int invMod(const int x) {
     // Brute force finds for a solution to an inverse mod
     for (int i=1; i<=25; i++) {
         int mod = (x*i) % 26;
-        if (mod < 0 && mod + 26 == 1) return i;
-        else if (mod == 1) return i;
+        if (mod == 1 || mod == -1) return i;
     }
     throw std::invalid_argument("Inverse mod for this encoding matrix does not exist!");
 }
@@ -138,7 +121,7 @@ std::vector<std::vector<int>> invertMatrix(const std::vector<std::vector<int>> m
         inverse.push_back(std::vector<int>(0, 0));
         for (int j=0; j<m[0].size(); j++) {
             // Takes mod 26 of adjoint, and inverse mod of the determinant to ensure integer results
-            inverse[i].push_back(adjoint[i][j] % 26 * invMod(determinant(m)));
+            inverse[i].push_back((adjoint[i][j] % 26 * invMod(determinant(m))) % 26);
             // Ensures all values of inverse are positive
             if (inverse[i][j] < 0) {
                 inverse[i][j] = inverse[i][j] + 26;
@@ -183,6 +166,7 @@ std::string encode(const std::string plaintext, const std::vector<std::vector<in
 }
 
 // Decodes a ciphertext encoded with a Hill Cypher knowing the encoding matrix
+// not working for 3x3 matrix
 std::string decode(const std::string ciphertext, const std::vector<std::vector<int>> encoding) {
     std::queue<int> ciphertextNumbers = letterToNumber(ciphertext);
     std::queue<int> plaintextNumbers;
@@ -209,7 +193,7 @@ std::string decode(const std::string ciphertext, const std::vector<std::vector<i
             ciphertextNumbers.pop();
         }
         // Multiplies v with the encoding matrix and adds the result to ciphertextNumbers
-        v = multiplyMatrixVector(v, inverse);
+        v = multiplyMatrixVector(inverse, v);
         for (int & num: v) {
             plaintextNumbers.push(num % 26);
         }
@@ -218,22 +202,12 @@ std::string decode(const std::string ciphertext, const std::vector<std::vector<i
 }
 
 int main() {
-    std::string message = "To be, or not to be, that is the question:"
-                            "Whether 'tis nobler in the mind to suffer"
-                            "The slings and arrows of outrageous fortune,"
-                            "Or to take arms against a sea of troubles";
-    std::vector<std::vector<int>> key {{1, 3}, {3, 4}};
+    std::string message = "To be, or not to be, that is the question";
+    std::vector<std::vector<int>> key {{1, 2 ,3}, {0, 1, 2}, {0, 0, 1}};
     std::string encoded = encode(message, key);
     std::string decoded = decode(encoded, key);
-    std::cout<< encoded << " ";
-    std::cout << decoded;
-    std::vector<std::vector<int>> inverse = invertMatrix(key);
-    std::vector<std::vector<int>> a = minor(key, 0, 0);
-    //std::cout << determinant(key);
-    // for (int i=0; i < inverse.size(); i++) {
-    //     for (int j=0; j<inverse.size(); j++) {
-    //         std::cout << inverse[i][j] << " ";
-    //     }
-    // }
+    std::cout<< encoded << std::endl;
+    std::cout << decoded << std::endl;
+
     return 0;
 }
