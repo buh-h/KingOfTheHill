@@ -70,24 +70,32 @@ std::vector<int> multiplyMatrixVector(const std::vector<int> v, const std::vecto
     return result;
 }
 // Finds the minor of a matrix
-// Something going out of bounds or similar, its awkward
-std::vector<std::vector<int>> minor(const std::vector<std::vector<int>> m, int x, int y) {
-    std::vector<std::vector<int>> minor; 
-    int index = 0;
+std::vector<std::vector<int>> minor(std::vector<std::vector<int>> m, int x, int y) {
+    // std::vector<std::vector<int>> minor; 
+    // int index = 0;
+    // for (int i=0; i<m.size(); i++) {
+    //     // Creates a new row vector
+    //     if (i != x) {
+    //          minor.push_back(std::vector<int>(0, 0));
+    //         // Populates new row vector ignoring value when j == x
+    //         for (int j=0; j<m[0].size(); j++) {
+    //             if (j != y) {
+    //                 minor[0].push_back(m[i][j]);
+    //             }
+    //         }
+    //         index++;
+    //     }
+    // }
+    // return minor;
+
+    // Erases the xth row of m
+    m.erase(m.begin() + x);
+    // Erases all elements in the yth row of m
     for (int i=0; i<m.size(); i++) {
-        // Creates a new row vector
-        if (i != x) {
-             minor.push_back(std::vector<int>(0, 0));
-            // Populates new row vector ignoring value when j == x
-            for (int j=0; j<m[0].size(); j++) {
-                if (j != y) {
-                    minor[0].push_back(m[i][j]);
-                }
-            }
-            index++;
-        }
+        m[i].erase(m[i].begin() + y);
     }
-    return minor;
+
+    return m;
 }
 // Finds the determinant of a matrix
 int determinant(const std::vector<std::vector<int>> m) {
@@ -139,6 +147,7 @@ std::vector<std::vector<int>> invertMatrix(const std::vector<std::vector<int>> m
     }
     return inverse;
 }
+
 // Encodes a plaintext string with a Hill Cipher
 std::string encode(const std::string plaintext, const std::vector<std::vector<int>> encoding) {
     std::queue<int> plaintextNumbers = letterToNumber(plaintext);
@@ -213,7 +222,7 @@ int main() {
                             "Whether 'tis nobler in the mind to suffer"
                             "The slings and arrows of outrageous fortune,"
                             "Or to take arms against a sea of troubles";
-    std::vector<std::vector<int>> key {{1, 2}, {1, 15}};
+    std::vector<std::vector<int>> key {{1, 3}, {3, 4}};
     std::string encoded = encode(message, key);
     std::string decoded = decode(encoded, key);
     std::cout<< encoded << " ";
