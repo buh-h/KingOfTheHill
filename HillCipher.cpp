@@ -109,7 +109,7 @@ int invMod(const int x) {
     for (int i=1; i<=25; i++) {
         int mod = (x*i) % 26;
         if (mod < 0 && mod + 26 == 1) return i;
-        else if ((x*i) % 26 == 1) return i;
+        else if (mod == 1) return i;
     }
     throw std::invalid_argument("Inverse mod for this encoding matrix does not exist!");
 }
@@ -147,7 +147,8 @@ std::string encode(const std::string plaintext, const std::vector<std::vector<in
     if (encoding.size() != encoding[0].size()) {
         throw std::invalid_argument("Encoding Matrix is not square!");
     }
-    if (26 % determinant(encoding) == 0) {
+    // Determinant of encoding matrix must be relatively prime to 26, not even or 13
+    if (determinant(encoding) % 2 == 0 || determinant(encoding) == 13) {
         throw std::invalid_argument("Determinant of encoding matrix is not relatively prime to 26!");
     }
     // Ensures plaintextNumbers is divisible by n by repeating the last element
@@ -180,7 +181,8 @@ std::string decode(const std::string ciphertext, const std::vector<std::vector<i
     if (encoding.size() != encoding[0].size()) {
         throw std::invalid_argument("Encoding Matrix is not square!");
     }
-    if (26 % determinant(encoding) == 0) {
+    // Determinant of encoding matrix must be relatively prime to 26, not even or 13
+    if (determinant(encoding) % 2 == 0 || determinant(encoding) == 13) {
         throw std::invalid_argument("Determinant of encoding matrix is not relatively prime to 26!");
     }
     // Ensures ciphertextNumbers is divisible by n by repeating the last element
@@ -207,8 +209,11 @@ std::string decode(const std::string ciphertext, const std::vector<std::vector<i
 }
 
 int main() {
-    std::string message = "this is a test message";
-    std::vector<std::vector<int>> key {{1, 3}, {3, 4}};
+    std::string message = "To be, or not to be, that is the question:"
+                            "Whether 'tis nobler in the mind to suffer"
+                            "The slings and arrows of outrageous fortune,"
+                            "Or to take arms against a sea of troubles";
+    std::vector<std::vector<int>> key {{1, 2}, {1, 15}};
     std::string encoded = encode(message, key);
     std::string decoded = decode(encoded, key);
     std::cout<< encoded << " ";
