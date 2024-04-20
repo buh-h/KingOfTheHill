@@ -140,7 +140,7 @@ std::string encode(const std::string plaintext, const std::vector<std::vector<in
         throw std::invalid_argument("Encoding Matrix is not square!");
     }
     // Determinant of encoding matrix must be relatively prime to 26, not even or 13
-    if (determinant(encoding) % 2 == 0 || determinant(encoding) == 13) {
+    if (determinant(encoding) % 2 == 0 || determinant(encoding) % 13 == 0) {
         throw std::invalid_argument("Determinant of encoding matrix is not relatively prime to 26!");
     }
     // Ensures plaintextNumbers is divisible by n by repeating the last element
@@ -175,7 +175,7 @@ std::string decode(const std::string ciphertext, const std::vector<std::vector<i
         throw std::invalid_argument("Encoding Matrix is not square!");
     }
     // Determinant of encoding matrix must be relatively prime to 26, not even or 13
-    if (determinant(encoding) % 2 == 0 || determinant(encoding) == 13) {
+    if (determinant(encoding) % 2 == 0 || determinant(encoding) % 13 == 0) {
         throw std::invalid_argument("Determinant of encoding matrix is not relatively prime to 26!");
     }
     // Ensures ciphertextNumbers is divisible by n by repeating the last element
