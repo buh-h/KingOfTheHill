@@ -8,7 +8,7 @@ Encodes messages with a Hill Cipher, or decodes messages when provided an encodi
 4. Converts the encrypted integers back into letters.
 
 # Decoding (with encoding matrix): 
-1. Converts the letters in an encoding message into integer values
+1. Converts the letters in a message into integer values
 2. Finds the inverse of the encoding matrix by calculating the determinant and adjoint matrix. Takes modulus of the
 values in the adjoint matrix and the modular multiplicative inverse of the determinant to ensure all values are integers
 3. Multiplies the integer values by the matrix and mods each value by 26
